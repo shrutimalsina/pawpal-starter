@@ -16,18 +16,23 @@ classDiagram
     }
 
     class Task {
-        +str title
+        +str description
         +int duration_minutes
         +str priority
         +str time
+        +str frequency
         +bool completed
+        +str pet_name
         +mark_complete() None
     }
 
     class Scheduler {
         +Owner owner
+        +list~Task~ plan
+        +list~Task~ skipped
         +generate_plan() list~Task~
         +sort_by_priority(tasks: list~Task~) list~Task~
+        +sort_by_time(tasks: list~Task~) list~Task~
         +explain_plan() str
     }
 
