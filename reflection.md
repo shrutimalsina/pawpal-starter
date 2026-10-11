@@ -49,7 +49,12 @@
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
+
+-My conflict check does not compare every task with every other task. Instead, it puts the day's tasks in time order and goes through them once, keeping track of the task that ends the latest so far. If the next task starts before that task ends, it shows a warning. This means it does catch overlapping tasks, not just ones at the exact same time (for example, a 30 minute walk at 07:30 and feeding at 07:45). But it can miss reporting some pairs. For example, if Mochi has a 2 hour hike at 07:00, and there's breakfast at 07:30 and meds at 07:35, I get a warning for the hike and breakfast, and for the hike and meds, but not a separate one saying breakfast and meds also clash with each other.
+
 - Why is that tradeoff reasonable for this scenario?
+
+-I think this is reasonable because every task that clashes still gets flagged at least once, so the owner will still notice it and fix it. A pet owner only has a handful of tasks in a day, so they don't need a full list of every single pair that clashes, they just need to know which tasks to move. It also keeps the code simple and easy to follow. The check also only gives a warning instead of crashing or moving tasks around on its own, so the owner gets to decide what to change.
 
 ---
 
