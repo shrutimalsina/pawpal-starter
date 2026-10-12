@@ -62,17 +62,18 @@ class Task:
     def next_occurrence(self, today: date | None = None) -> "Task | None":
         """Return a copy of this task for its next due date, or None if it doesn't repeat.
 
-        The new due date is counted from today, not from the old due date, so a
-        task finished late doesn't come back already overdue:
-        "daily" -> today + 1 day, "weekly" -> today + 7 days, "once" -> None.
+        The new due date is counted from whichever is later, today or the old
+        due date. A task finished late doesn't come back already overdue, and a
+        task finished early doesn't come back due on the same day it was:
+        "daily" -> +1 day, "weekly" -> +7 days, "once" -> None.
         The copy keeps every other field (description, pet, time, priority)
         and starts as not completed. Pass `today` to use a fixed date in tests.
         """
         days = RECURRENCE_DAYS.get(self.frequency)
         if days is None:
             return None
-        today = today or date.today()
-        return replace(self, completed=False, due_date=today + timedelta(days=days))
+        start = max(today or date.today(), self.due_date)
+        return replace(self, completed=False, due_date=start + timedelta(days=days))
 
 
 @dataclass

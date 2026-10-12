@@ -92,6 +92,18 @@ def test_overdue_daily_task_is_next_due_tomorrow_not_in_the_past():
     assert upcoming.due_date == date(2026, 10, 12)
 
 
+def test_weekly_task_finished_early_is_next_due_a_week_after_its_due_date():
+    today = date(2026, 10, 11)
+    pet = Pet("Mochi", "dog")
+    task = Task("Bath", 45, frequency="weekly", due_date=date(2026, 10, 18))
+    pet.add_task(task)
+    scheduler = make_scheduler(pet)
+
+    upcoming = scheduler.mark_task_complete(task, today=today)
+
+    assert upcoming.due_date == date(2026, 10, 25)
+
+
 def test_completing_same_task_twice_does_not_duplicate():
     pet = Pet("Mochi", "dog")
     task = Task("Walk", 30)

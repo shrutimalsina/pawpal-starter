@@ -1,0 +1,56 @@
+classDiagram
+    class Owner {
+        +str name
+        +int available_minutes
+        +list~Pet~ pets
+        +add_pet(pet: Pet) None
+        +get_all_tasks() list~Task~
+    }
+
+    class Pet {
+        +str name
+        +str species
+        +int age
+        +list~Task~ tasks
+        +add_task(task: Task) None
+    }
+
+    class Task {
+        +str description
+        +int duration_minutes
+        +str priority
+        +str time
+        +str frequency
+        +bool completed
+        +str pet_name
+        +date due_date
+        +int start_minutes
+        +int end_minutes
+        +mark_complete() None
+        +next_occurrence(today: date) Task
+    }
+
+    class Scheduler {
+        +Owner owner
+        +list~Task~ plan
+        +list~Task~ skipped
+        +int minutes_used
+        +filter_tasks(pet_name: str, completed: bool) list~Task~
+        +generate_plan(today: date) list~Task~
+        +sort_by_priority(tasks: list~Task~) list~Task~
+        +sort_by_time(tasks: list~Task~) list~Task~
+        +mark_task_complete(task: Task, today: date) Task
+        +detect_conflicts(tasks: list~Task~) list~str~
+        +explain_plan() str
+        -_conflict_message(first: Task, second: Task)$ str
+    }
+
+    Owner "1" *-- "*" Pet : owns
+    Pet "1" *-- "*" Task : has
+    Scheduler "1" --> "1" Owner : plans for
+    Scheduler "1" o-- "*" Task : plan / skipped
+    Task ..> Task : next_occurrence() creates
+    Scheduler ..> Pet : mark_task_complete() adds next task to
+
+    note for Task "time is normalized to HH:MM on creation.<br>start_minutes and end_minutes are read-only properties<br>(None when the task has no time).<br>next_occurrence() returns None for 'once' tasks."
+    note for Scheduler "minutes_used is a read-only property.<br>PRIORITY_ORDER: high=3, medium=2, low=1<br>RECURRENCE_DAYS: daily=1, weekly=7"
