@@ -86,19 +86,41 @@ Completed Vet checkup (once): no repeat.
 
 ## 🧪 Testing PawPal+
 
+Run the full test suite from the project folder (with the virtual environment active):
+
 ```bash
-# Run the full test suite:
-pytest
-
-# Run with coverage:
-pytest --cov
+python -m pytest
 ```
 
-Sample test output:
+### What the tests cover
+
+The 32 tests in `tests/test_pawpal.py` check both normal use ("happy paths") and edge cases:
+
+- **Sorting:** tasks come back in clock order (`"8:00"` before `"10:00"`, `"00:00"` first), tasks with no time go last, and tasks at the same time keep the order they were added. Priority sorting goes high → medium → low, with shorter tasks first on ties and unknown priorities last.
+- **Building the plan:** high priority tasks are picked first within the owner's time, a smaller task can still fit after a big one is skipped, a task that exactly fills the time is included, and completed or not-yet-due tasks are left out. Edge cases include 0 minutes available, a pet with no tasks, and an owner with no pets.
+- **Recurring tasks:** completing a daily task adds a new one for the next day (weekly adds one 7 days later), keeping the same time and priority. "Once" tasks don't repeat, completing a task twice doesn't make a duplicate, late tasks don't come back overdue, and Dec 31 rolls over to Jan 1.
+- **Conflict detection:** tasks at the exact same time or overlapping times are flagged, for the same pet or across pets. Back-to-back tasks, tasks on different days, and tasks with no time are not flagged.
+- **Basics:** marking a task complete, adding tasks to a pet, filtering by pet and status, and rejecting invalid times like `"25:00"`.
+
+### Sample test output
 
 ```
-# Paste your pytest output here
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0
+rootdir: /Users/shrutitimalsina/Desktop/AI Engineering/Project2/pawpal-starter
+plugins: anyio-4.15.1
+collected 32 items
+
+tests/test_pawpal.py ................................                    [100%]
+
+============================== 32 passed in 0.02s ==============================
 ```
+
+### Confidence level
+
+⭐⭐⭐⭐☆ (4/5)
+
+All 32 tests pass, and they cover the scheduler's main jobs (sorting, choosing tasks within the time limit, recurring tasks, and conflict warnings) along with the edge cases I could think of. I'm not giving it 5 stars because a few cases aren't handled yet: a task's duration can be 0 or negative, a task that runs past midnight isn't checked against the next day's tasks, and the Streamlit UI itself isn't covered by automated tests.
 
 ## 📐 Smarter Scheduling
 
